@@ -4,14 +4,27 @@ import Anthropic from "@anthropic-ai/sdk";
 
 const router = Router();
 
+// Support both Replit AI Integrations and direct API keys
+const openaiBaseURL = process.env.AI_INTEGRATIONS_OPENAI_BASE_URL ?? undefined;
+const openaiApiKey =
+  process.env.AI_INTEGRATIONS_OPENAI_API_KEY ??
+  process.env.OPENAI_API_KEY ??
+  "placeholder";
+
+const anthropicBaseURL = process.env.AI_INTEGRATIONS_ANTHROPIC_BASE_URL ?? undefined;
+const anthropicApiKey =
+  process.env.AI_INTEGRATIONS_ANTHROPIC_API_KEY ??
+  process.env.ANTHROPIC_API_KEY ??
+  "placeholder";
+
 const openaiClient = new OpenAI({
-  baseURL: process.env.AI_INTEGRATIONS_OPENAI_BASE_URL,
-  apiKey: process.env.AI_INTEGRATIONS_OPENAI_API_KEY ?? "placeholder",
+  baseURL: openaiBaseURL,
+  apiKey: openaiApiKey,
 });
 
 const anthropicClient = new Anthropic({
-  baseURL: process.env.AI_INTEGRATIONS_ANTHROPIC_BASE_URL,
-  apiKey: process.env.AI_INTEGRATIONS_ANTHROPIC_API_KEY ?? "placeholder",
+  baseURL: anthropicBaseURL,
+  apiKey: anthropicApiKey,
 });
 
 const MODELS = [

@@ -158,14 +158,26 @@ function ProviderBadge({ provider }: { provider: string }) {
   );
 }
 
+type SetupStatus = {
+  proxyApiKey: boolean;
+  openai: { configured: boolean; mode: string };
+  anthropic: { configured: boolean; mode: string };
+} | null;
+
 export default function App() {
   const [status, setStatus] = useState<"loading" | "online" | "offline">("loading");
+  const [setup, setSetup] = useState<SetupStatus>(null);
   const baseUrl = window.location.origin;
 
   useEffect(() => {
     fetch("/api/healthz")
       .then((r) => setStatus(r.ok ? "online" : "offline"))
       .catch(() => setStatus("offline"));
+
+    fetch("/api/setup-status")
+      .then((r) => r.json())
+      .then(setSetup)
+      .catch(() => setSetup(null));
   }, []);
 
   const curlExample = `curl ${baseUrl}/v1/chat/completions \\
@@ -256,6 +268,63 @@ export default function App() {
             One endpoint, two providers. Powered by Replit AI Integrations — no API keys required.
           </p>
         </div>
+
+        {/* Setup Status */}
+        {setup && (
+          <Card>
+            <SectionTitle>配置状态</SectionTitle>
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              {[
+                {
+                  label: "PROXY_API_KEY",
+                  ok: setup.proxyApiKey,
+                  okText: "已配置",
+                  failText: "未设置 — 在 Replit Secrets 中添加 PROXY_API_KEY",
+                },
+                {
+                  label: "OpenAI",
+                  ok: setup.openai.configured,
+                  okText: setup.openai.mode === "replit-integration" ? "Replit AI Integration" : "API Key (OPENAI_API_KEY)",
+                  failText: "未配置 — 设置 OPENAI_API_KEY 或通过 Replit AI Integrations",
+                },
+                {
+                  label: "Anthropic",
+                  ok: setup.anthropic.configured,
+                  okText: setup.anthropic.mode === "replit-integration" ? "Replit AI Integration" : "API Key (ANTHROPIC_API_KEY)",
+                  failText: "未配置 — 设置 ANTHROPIC_API_KEY 或通过 Replit AI Integrations",
+                },
+              ].map((item) => (
+                <div
+                  key={item.label}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 10,
+                    background: BG,
+                    border: `1px solid ${item.ok ? "#22c55e33" : "#ef444433"}`,
+                    borderRadius: 8,
+                    padding: "10px 14px",
+                  }}
+                >
+                  <span style={{ fontSize: 14, flexShrink: 0 }}>{item.ok ? "✅" : "❌"}</span>
+                  <span style={{ fontWeight: 600, fontSize: 13, flexShrink: 0, minWidth: 110 }}>{item.label}</span>
+                  <span style={{ fontSize: 13, color: item.ok ? "#86efac" : "#fca5a5" }}>
+                    {item.ok ? item.okText : item.failText}
+                  </span>
+                </div>
+              ))}
+            </div>
+            {(!setup.proxyApiKey || !setup.openai.configured || !setup.anthropic.configured) && (
+              <div style={{ marginTop: 14, padding: "10px 14px", background: "#f9731611", border: "1px solid #f9731633", borderRadius: 8, fontSize: 13, color: "#fdba74", lineHeight: 1.6 }}>
+                <strong>拉取后快速配置：</strong>
+                <br />1. Replit Secrets 中添加 <code style={{ color: TEXT }}>PROXY_API_KEY</code>（任意字符串）
+                <br />2. 添加 <code style={{ color: TEXT }}>OPENAI_API_KEY</code> 和/或 <code style={{ color: TEXT }}>ANTHROPIC_API_KEY</code>
+                <br />   <span style={{ color: MUTED }}>或：让 Replit Agent 运行 AI Integrations 初始化（免费，费用计入 Replit 积分）</span>
+                <br />3. 重启 API Server workflow
+              </div>
+            )}
+          </Card>
+        )}
 
         {/* Connection Details */}
         <Card>
