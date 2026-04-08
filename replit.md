@@ -14,7 +14,8 @@
 1. 调用 `setupReplitAIIntegrations` 注册 OpenAI 和 Anthropic 两个 Integration
 2. 如果 `PROXY_API_KEY` 未设置，生成一个随机字符串并通过 `setSecret` 写入
 3. 重启 `artifacts/api-server: API Server` workflow
-4. 告知用户初始化完成，并显示 `PROXY_API_KEY` 的值
+4. 调用 `suggest_deploy` 发布项目
+5. 告知用户初始化完成，并显示 `PROXY_API_KEY` 的值和已发布的公开地址
 
 这是一次性操作，完成后环境变量会持久保留，后续无需重复执行。
 
