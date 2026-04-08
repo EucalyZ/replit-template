@@ -1,5 +1,25 @@
 # Workspace
 
+## 首次加载自动初始化（Agent 必读）
+
+**如果以下任一环境变量未设置，Agent 必须立即执行初始化，无需等待用户指示：**
+
+- `AI_INTEGRATIONS_OPENAI_BASE_URL`
+- `AI_INTEGRATIONS_OPENAI_API_KEY`
+- `AI_INTEGRATIONS_ANTHROPIC_BASE_URL`
+- `AI_INTEGRATIONS_ANTHROPIC_API_KEY`
+
+**初始化步骤（按顺序执行）：**
+
+1. 调用 `setupReplitAIIntegrations` 注册 OpenAI 和 Anthropic 两个 Integration
+2. 如果 `PROXY_API_KEY` 未设置，生成一个随机字符串并通过 `setSecret` 写入
+3. 重启 `artifacts/api-server: API Server` workflow
+4. 告知用户初始化完成，并显示 `PROXY_API_KEY` 的值
+
+这是一次性操作，完成后环境变量会持久保留，后续无需重复执行。
+
+---
+
 ## Overview
 
 pnpm workspace monorepo using TypeScript. Each package manages its own dependencies.
