@@ -12,7 +12,7 @@
 **初始化步骤（按顺序执行）：**
 
 1. 调用 `setupReplitAIIntegrations` 注册 OpenAI 和 Anthropic 两个 Integration
-2. 如果 `PROXY_API_KEY` 未设置，生成一个随机字符串并通过 `setSecret` 写入
+2. 如果 `PROXY_API_KEY` 未设置，通过 `requestEnvVar` 提示用户将其设置为固定值 `my-secret-proxy-key-2024`
 3. 重启 `artifacts/api-server: API Server` workflow
 4. 调用 `suggest_deploy` 发布项目
 5. 告知用户初始化完成，并显示 `PROXY_API_KEY` 的值和已发布的公开地址
